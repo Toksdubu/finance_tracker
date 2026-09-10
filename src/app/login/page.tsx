@@ -2,38 +2,62 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Lock, Mail, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
-import { INITIAL_PROFILES } from '@/lib/mock-data';
+import { ShieldCheck, Lock, Mail, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useFinance } from '@/context/FinanceContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useFinance();
+
   const [tab, setTab] = useState<'OFFICER' | 'MEMBER'>('OFFICER');
   const [email, setEmail] = useState('president@pupaccess.org');
   const [password, setPassword] = useState('access2026!');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
-    // Identify profile or default to selected
-    let selectedProfile = INITIAL_PROFILES.president;
-    if (email.includes('treasurer')) selectedProfile = INITIAL_PROFILES.treasurer;
-    else if (email.includes('projecthead')) selectedProfile = INITIAL_PROFILES.projectHead;
-    else if (email.includes('pup.edu.ph') || tab === 'MEMBER') selectedProfile = INITIAL_PROFILES.studentMember;
+    const result = login(email, password, tab);
 
-    localStorage.setItem('access_user', JSON.stringify(selectedProfile));
-
-    setTimeout(() => {
+    if (result.success) {
+      setTimeout(() => {
+        setLoading(false);
+        router.push('/dashboard');
+      }, 500);
+    } else {
       setLoading(false);
-      router.push('/dashboard');
-    }, 600);
+      setErrorMessage(result.message);
+    }
   };
 
   const handleQuickLogin = (roleKey: 'president' | 'treasurer' | 'projectHead' | 'studentMember') => {
-    const profile = INITIAL_PROFILES[roleKey];
-    localStorage.setItem('access_user', JSON.stringify(profile));
-    router.push('/dashboard');
+    setErrorMessage(null);
+    setLoading(true);
+
+    let targetEmail = 'president@pupaccess.org';
+    let targetTab: 'OFFICER' | 'MEMBER' = 'OFFICER';
+
+    if (roleKey === 'treasurer') targetEmail = 'treasurer@pupaccess.org';
+    else if (roleKey === 'projectHead') targetEmail = 'projecthead.hardhatting@pupaccess.org';
+    else if (roleKey === 'studentMember') {
+      targetEmail = 'student.member@pup.edu.ph';
+      targetTab = 'MEMBER';
+    }
+
+    const result = login(targetEmail, 'access2026!', targetTab);
+    if (result.success) {
+      setTimeout(() => {
+        setLoading(false);
+        router.push('/dashboard');
+      }, 400);
+    } else {
+      setLoading(false);
+      setErrorMessage(result.message);
+    }
   };
 
   return (
@@ -71,6 +95,8 @@ export default function LoginPage() {
               onClick={() => {
                 setTab('OFFICER');
                 setEmail('president@pupaccess.org');
+                setPassword('access2026!');
+                setErrorMessage(null);
               }}
               className={`rounded-lg py-2 text-xs font-semibold transition ${
                 tab === 'OFFICER'
@@ -85,6 +111,7 @@ export default function LoginPage() {
               onClick={() => {
                 setTab('MEMBER');
                 setEmail('student.member@pup.edu.ph');
+                setErrorMessage(null);
               }}
               className={`rounded-lg py-2 text-xs font-semibold transition ${
                 tab === 'MEMBER'
@@ -95,6 +122,17 @@ export default function LoginPage() {
               ACCSS Member SSO
             </button>
           </div>
+
+          {/* Error Message Banner */}
+          {errorMessage && (
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-[#fb2c36]/40 bg-[#fb2c36]/10 p-3 text-xs text-[#fb2c36]">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold">Authentication Failed</p>
+                <p className="text-[11px] text-[#ff8088] mt-0.5">{errorMessage}</p>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -123,12 +161,20 @@ export default function LoginPage() {
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-3 h-4 w-4 text-[#71717a]" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-10 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition font-mono"
+                    placeholder="••••••••••••"
+                    className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] pl-10 pr-10 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition font-mono"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-3 text-[#71717a] hover:text-[#a1a1aa]"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
             )}
@@ -200,3 +246,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

@@ -56,20 +56,15 @@
 
 ```
 finance_tracker/
-├── ARCHITECTURE.md          # Full architectural & database specification
-├── README.md                # Project documentation
-├── public/                  # Static assets & branding
+├── docs/                        # Backend integration & architectural documentation
+│   ├── BACKEND_INTEGRATION_WORKFLOW.md  # Supabase setup, encryption & step-by-step workflow
+│   ├── DATABASE_SCHEMA.md               # PostgreSQL schema, enums & table definitions
+│   └── API_ENDPOINTS_AND_CONTRACTS.md   # Server Actions, API contracts & cryptographic verifier
+├── supabase/                    # Supabase backend migrations & RLS policies
+│   └── migrations/              # PostgreSQL SQL migration scripts
+├── ARCHITECTURE.md              # Full architectural & technical design document
+├── README.md                    # Project documentation
 ├── src/
-│   ├── app/                 # Next.js App Router pages & server actions
-│   │   ├── dashboard/       # Protected internal dashboard routes
-│   │   │   ├── ai-copilot/  # AI assistant & receipt analysis
-│   │   │   ├── approvals/   # Executive multi-tier approval desk
-│   │   │   ├── audit/       # Cryptographic ledger & audit block viewer
-│   │   │   └── expenses/    # Expense voucher submission & tracking
-│   │   ├── login/           # Authentication gate
-│   │   └── robots.ts        # Search crawler shield
-│   ├── components/          # Reusable UI components & layouts
-│   ├── context/             # FinanceContext & application state
 │   ├── lib/                 # Security, storage, & Supabase utilities
 │   │   ├── security/        # AES-256-GCM encryption & SHA-256 hashing
 │   │   ├── storage/         # WebP receipt compressor

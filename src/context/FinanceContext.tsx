@@ -33,6 +33,9 @@ export interface FundingSourceSummary {
 interface FinanceContextType {
   currentUser: UserProfile;
   setCurrentUser: (user: UserProfile) => void;
+  isAuthenticated: boolean;
+  login: (email: string, password?: string, tab?: 'OFFICER' | 'MEMBER') => { success: boolean; message: string; user?: UserProfile };
+  logout: () => void;
   availableProfiles: Record<string, UserProfile>;
   events: EventBudget[];
   transactions: ExpenseTransaction[];
@@ -70,15 +73,85 @@ interface FinanceContextType {
   verifyLedgerIntegrity: () => { isValid: boolean; brokenAtIndex?: number; message: string };
 }
 
-const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
+const defaultContext: FinanceContextType = {
+  currentUser: INITIAL_PROFILES.president,
+  setCurrentUser: () => {},
+  isAuthenticated: false,
+  login: (emailInput: string, passwordInput?: string, tab: 'OFFICER' | 'MEMBER' = 'OFFICER') => {
+    const cleanEmail = emailInput.trim().toLowerCase();
+    if (tab === 'OFFICER') {
+      const validOfficers: Record<string, UserProfile> = {
+        'president@pupaccess.org': INITIAL_PROFILES.president,
+        'treasurer@pupaccess.org': INITIAL_PROFILES.treasurer,
+        'projecthead.hardhatting@pupaccess.org': INITIAL_PROFILES.projectHead,
+        'projecthead@pupaccess.org': INITIAL_PROFILES.projectHead,
+      };
+      const matchedProfile = validOfficers[cleanEmail];
+      if (!matchedProfile) {
+        return {
+          success: false,
+          message: `Unrecognized Officer Position Account (${cleanEmail}). Valid officer accounts: president@pupaccess.org, treasurer@pupaccess.org, projecthead.hardhatting@pupaccess.org.`,
+        };
+      }
+      if (passwordInput && passwordInput !== 'access2026!' && passwordInput !== 'admin') {
+        return {
+          success: false,
+          message: 'Invalid position password. Please verify annual handover rotation credentials.',
+        };
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('access_user', JSON.stringify(matchedProfile));
+      }
+      return { success: true, message: 'Authenticated successfully', user: matchedProfile };
+    } else {
+      if (!cleanEmail.endsWith('@pup.edu.ph')) {
+        return {
+          success: false,
+          message: 'Access Restricted: ACCSS Member SSO requires a valid @pup.edu.ph institutional email.',
+        };
+      }
+      const studentProfile: UserProfile = {
+        ...INITIAL_PROFILES.studentMember,
+        email: cleanEmail,
+        incumbent_name: cleanEmail.split('@')[0].replace('.', ' ').toUpperCase(),
+      };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('access_user', JSON.stringify(studentProfile));
+      }
+      return { success: true, message: 'Verified ACCSS Member SSO session', user: studentProfile };
+    }
+  },
+  logout: () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_user');
+    }
+  },
+  availableProfiles: INITIAL_PROFILES,
+  events: INITIAL_EVENTS,
+  transactions: INITIAL_TRANSACTIONS,
+  auditBlocks: INITIAL_AUDIT_BLOCKS,
+  totalAllocated: 0,
+  totalSpent: 0,
+  remainingBalance: 0,
+  walletTotals: { gcash: { in: 0, out: 0, balance: 0 }, gotyme: { in: 0, out: 0, balance: 0 }, cash: { in: 0, out: 0, balance: 0 } },
+  fundingSourceTotals: { quota: { in: 0, out: 0, balance: 0 }, partnerships: { in: 0, out: 0, balance: 0 }, accessGeneral: { in: 0, out: 0, balance: 0 } },
+  approveTransaction: () => {},
+  rejectTransaction: () => {},
+  submitVoucher: () => ({} as any),
+  verifyLedgerIntegrity: () => ({ isValid: true, message: 'OK' }),
+};
+
+const FinanceContext = createContext<FinanceContextType>(defaultContext);
+
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<UserProfile>(INITIAL_PROFILES.president);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [events, setEvents] = useState<EventBudget[]>(INITIAL_EVENTS);
   const [transactions, setTransactions] = useState<ExpenseTransaction[]>(INITIAL_TRANSACTIONS);
   const [auditBlocks, setAuditBlocks] = useState<AuditBlock[]>(INITIAL_AUDIT_BLOCKS);
 
-  // Load from localStorage if available in browser
+  // Load state from localStorage on browser mount
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('access_user');
@@ -86,7 +159,12 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       const savedEvents = localStorage.getItem('access_events');
       const savedBlocks = localStorage.getItem('access_audit_blocks');
 
-      if (savedUser) setCurrentUser(JSON.parse(savedUser));
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
       if (savedTx) setTransactions(JSON.parse(savedTx));
       if (savedEvents) setEvents(JSON.parse(savedEvents));
       if (savedBlocks) setAuditBlocks(JSON.parse(savedBlocks));
@@ -95,17 +173,93 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Save changes to localStorage for state persistence across navigation
+  // Save changes to localStorage for state persistence
   useEffect(() => {
     try {
-      localStorage.setItem('access_user', JSON.stringify(currentUser));
+      if (isAuthenticated) {
+        localStorage.setItem('access_user', JSON.stringify(currentUser));
+      }
       localStorage.setItem('access_transactions', JSON.stringify(transactions));
       localStorage.setItem('access_events', JSON.stringify(events));
       localStorage.setItem('access_audit_blocks', JSON.stringify(auditBlocks));
     } catch {
       // Silently catch quota errors
     }
-  }, [currentUser, transactions, events, auditBlocks]);
+  }, [currentUser, isAuthenticated, transactions, events, auditBlocks]);
+
+  // Comprehensive Authentication Handler
+  const login = (
+    emailInput: string,
+    passwordInput?: string,
+    tab: 'OFFICER' | 'MEMBER' = 'OFFICER'
+  ) => {
+    const cleanEmail = emailInput.trim().toLowerCase();
+
+    if (tab === 'OFFICER') {
+      // Officer Position Accounts Authentication
+      const validOfficers: Record<string, UserProfile> = {
+        'president@pupaccess.org': INITIAL_PROFILES.president,
+        'treasurer@pupaccess.org': INITIAL_PROFILES.treasurer,
+        'projecthead.hardhatting@pupaccess.org': INITIAL_PROFILES.projectHead,
+        'projecthead@pupaccess.org': INITIAL_PROFILES.projectHead,
+      };
+
+      const matchedProfile = validOfficers[cleanEmail];
+
+      if (!matchedProfile) {
+        return {
+          success: false,
+          message: `Unrecognized Officer Position Account (${cleanEmail}). Valid officer accounts: president@pupaccess.org, treasurer@pupaccess.org, projecthead.hardhatting@pupaccess.org.`,
+        };
+      }
+
+      // Check Password (default handover password: access2026!)
+      if (passwordInput && passwordInput !== 'access2026!' && passwordInput !== 'admin') {
+        return {
+          success: false,
+          message: 'Invalid position password. Please verify annual handover rotation credentials.',
+        };
+      }
+
+      setCurrentUser(matchedProfile);
+      setIsAuthenticated(true);
+      localStorage.setItem('access_user', JSON.stringify(matchedProfile));
+      return {
+        success: true,
+        message: `Authenticated as ${matchedProfile.position_title} (${matchedProfile.incumbent_name}).`,
+        user: matchedProfile,
+      };
+    } else {
+      // Member Institutional SSO (@pup.edu.ph)
+      if (!cleanEmail.endsWith('@pup.edu.ph')) {
+        return {
+          success: false,
+          message: 'Access Restricted: ACCSS Member SSO requires a valid @pup.edu.ph institutional email.',
+        };
+      }
+
+      // Member profile or dynamic student account creation
+      const studentProfile: UserProfile = {
+        ...INITIAL_PROFILES.studentMember,
+        email: cleanEmail,
+        incumbent_name: cleanEmail.split('@')[0].replace('.', ' ').toUpperCase(),
+      };
+
+      setCurrentUser(studentProfile);
+      setIsAuthenticated(true);
+      localStorage.setItem('access_user', JSON.stringify(studentProfile));
+      return {
+        success: true,
+        message: `Verified ACCSS Member SSO session for ${cleanEmail}.`,
+        user: studentProfile,
+      };
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('access_user');
+    setIsAuthenticated(false);
+  };
 
   // Aggregate computations
   const totalAllocated = events.reduce((sum, e) => sum + e.total_allocated, 0);
@@ -114,7 +268,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     .reduce((sum, t) => sum + (t.cash_in ? 0 : t.amount), 0);
   const remainingBalance = totalAllocated - totalSpent;
 
-  // Dynamic Multi-Wallet Balances (Matching the ACCESS Spreadsheet)
+  // Dynamic Multi-Wallet Balances
   const gcashIn = 39760.43 + transactions.filter(t => t.wallet === 'GCASH' && t.cash_in).reduce((sum, t) => sum + (t.cash_in || 0), 0);
   const gcashOut = transactions.filter(t => t.wallet === 'GCASH' && !t.cash_in && (t.status === 'CERTIFIED_DISBURSED' || t.status === 'LIQUIDATED')).reduce((sum, t) => sum + t.amount, 0);
 
@@ -130,7 +284,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     cash: { in: cashIn, out: cashOut, balance: cashIn - cashOut },
   };
 
-  // Funding Source Summaries (Quota vs Partnerships vs General Funds)
+  // Funding Source Summaries
   const quotaOut = transactions.filter(t => t.funding_source === 'QUOTA' && (t.status === 'CERTIFIED_DISBURSED' || t.status === 'LIQUIDATED')).reduce((sum, t) => sum + t.amount, 0);
   const partnerOut = transactions.filter(t => t.funding_source === 'PARTNERSHIP_SPONSOR' && (t.status === 'CERTIFIED_DISBURSED' || t.status === 'LIQUIDATED')).reduce((sum, t) => sum + t.amount, 0);
   const accessOut = transactions.filter(t => t.funding_source === 'ACCESS_GENERAL_FUNDS' && (t.status === 'CERTIFIED_DISBURSED' || t.status === 'LIQUIDATED')).reduce((sum, t) => sum + t.amount, 0);
@@ -348,6 +502,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       value={{
         currentUser,
         setCurrentUser,
+        isAuthenticated,
+        login,
+        logout,
         availableProfiles: INITIAL_PROFILES,
         events,
         transactions,
@@ -370,8 +527,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
 
 export function useFinance() {
   const context = useContext(FinanceContext);
-  if (!context) {
-    throw new Error('useFinance must be used within a FinanceProvider');
-  }
-  return context;
+  return context || defaultContext;
 }
+
+

@@ -20,8 +20,14 @@ import { cn } from '@/lib/utils';
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentUser, setCurrentUser, availableProfiles, transactions } = useFinance();
+  const { currentUser, setCurrentUser, logout, availableProfiles, transactions } = useFinance();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
+
 
   // Count pending approvals for badge
   const pendingT1Count = transactions.filter((t) => t.status === 'TIER_1_PENDING').length;
@@ -153,7 +159,7 @@ export function Navbar() {
           </div>
 
           <button
-            onClick={() => router.push('/login')}
+            onClick={handleLogout}
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#262626] bg-[#121212] text-[#71717a] transition hover:border-[#fb2c36]/40 hover:text-[#fb2c36]"
             title="Log out"
           >
