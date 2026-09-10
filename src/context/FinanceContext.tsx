@@ -17,6 +17,12 @@ import {
   INITIAL_AUDIT_BLOCKS,
 } from '@/lib/mock-data';
 import { generateAuditHash, generateApprovalSignature } from '@/lib/security/crypto';
+import {
+  fetchEventBudgetsFromDB,
+  fetchTransactionsFromDB,
+  fetchAuditBlocksFromDB,
+} from '@/lib/supabase/db-service';
+
 
 export interface WalletSummary {
   gcash: { in: number; out: number; balance: number };
@@ -143,7 +149,6 @@ const defaultContext: FinanceContextType = {
 
 const FinanceContext = createContext<FinanceContextType>(defaultContext);
 
-
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<UserProfile>(INITIAL_PROFILES.president);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -151,27 +156,36 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<ExpenseTransaction[]>(INITIAL_TRANSACTIONS);
   const [auditBlocks, setAuditBlocks] = useState<AuditBlock[]>(INITIAL_AUDIT_BLOCKS);
 
-  // Load state from localStorage on browser mount
+  // Load real data from Supabase DB and sync session from localStorage
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem('access_user');
-      const savedTx = localStorage.getItem('access_transactions');
-      const savedEvents = localStorage.getItem('access_events');
-      const savedBlocks = localStorage.getItem('access_audit_blocks');
+    async function loadLiveData() {
+      try {
+        const savedUser = localStorage.getItem('access_user');
+        if (savedUser) {
+          setCurrentUser(JSON.parse(savedUser));
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
 
-      if (savedUser) {
-        setCurrentUser(JSON.parse(savedUser));
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
+        // Fetch real database records from Supabase
+        const [dbEvents, dbTx, dbBlocks] = await Promise.all([
+          fetchEventBudgetsFromDB(),
+          fetchTransactionsFromDB(),
+          fetchAuditBlocksFromDB(),
+        ]);
+
+        if (dbEvents && dbEvents.length > 0) setEvents(dbEvents);
+        if (dbTx && dbTx.length > 0) setTransactions(dbTx);
+        if (dbBlocks && dbBlocks.length > 0) setAuditBlocks(dbBlocks);
+      } catch (err) {
+        console.warn('Failed loading database records, fallback to state:', err);
       }
-      if (savedTx) setTransactions(JSON.parse(savedTx));
-      if (savedEvents) setEvents(JSON.parse(savedEvents));
-      if (savedBlocks) setAuditBlocks(JSON.parse(savedBlocks));
-    } catch {
-      // Use initial state on error or SSR
     }
+
+    loadLiveData();
   }, []);
+
 
   // Save changes to localStorage for state persistence
   useEffect(() => {
