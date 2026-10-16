@@ -556,7 +556,7 @@ export default function NewExpensePage() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff7900] to-[#f26223] py-3.5 text-xs font-bold text-white shadow-xl shadow-[#ff7900]/25 transition hover:brightness-110 cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff7900] to-[#ff7900] py-3.5 text-xs font-bold text-white shadow-xl shadow-[#ff7900]/25 transition hover:brightness-110 cursor-pointer"
         >
           <span>Submit Voucher for Stage 1 Endorsement</span>
           <ArrowRight className="h-4 w-4" />

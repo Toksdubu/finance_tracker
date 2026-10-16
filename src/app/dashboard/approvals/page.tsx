@@ -251,11 +251,11 @@ export default function ApprovalsPage() {
       <div className="border-b border-[#262626] pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#f26223] animate-pulse" />
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#f26223]">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ff7900] animate-pulse" />
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#ff7900]">
               Review & Approvals Desk
             </span>
-            <span className="rounded-full bg-[#f26223]/15 text-[#f26223] border border-[#f26223]/30 px-2 py-0.5 text-[10px] font-mono font-bold">
+            <span className="rounded-full bg-[#ff7900]/15 text-[#ff7900] border border-[#ff7900]/30 px-2 py-0.5 text-[10px] font-mono font-bold">
               3-Stage Governance
             </span>
           </div>
@@ -270,9 +270,9 @@ export default function ApprovalsPage() {
         {/* Quick Guide Trigger */}
         <button
           onClick={() => setShowHowItWorks(!showHowItWorks)}
-          className="flex items-center gap-2 self-start md:self-auto rounded-xl border border-[#333] bg-[#141414] hover:bg-[#1a1a1a] px-3.5 py-2 text-xs font-semibold text-[#ededed] transition hover:border-[#f26223]/50 cursor-pointer shadow-sm"
+          className="flex items-center gap-2 self-start md:self-auto rounded-xl border border-[#333] bg-[#141414] hover:bg-[#1a1a1a] px-3.5 py-2 text-xs font-semibold text-[#ededed] transition hover:border-[#ff7900]/50 cursor-pointer shadow-sm"
         >
-          <HelpCircle className="h-4 w-4 text-[#f26223]" />
+          <HelpCircle className="h-4 w-4 text-[#ff7900]" />
           <span>How Approvals Work</span>
           {showHowItWorks ? <ChevronUp className="h-3.5 w-3.5 text-[#71717a]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#71717a]" />}
         </button>
@@ -283,7 +283,7 @@ export default function ApprovalsPage() {
         <div className="rounded-2xl border border-[#333] bg-gradient-to-br from-[#141414] to-[#0e0e0e] p-5 sm:p-6 space-y-4 shadow-xl">
           <div className="flex items-center justify-between border-b border-[#222] pb-3">
             <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[#f26223]" />
+              <Sparkles className="h-4 w-4 text-[#ff7900]" />
               The 3-Stage Financial Approval Cycle
             </h3>
             <span className="text-[11px] font-mono text-[#71717a]">PUP ACCESS Standard Governance</span>
@@ -335,7 +335,7 @@ export default function ApprovalsPage() {
       {/* Active Signer Context Banner with 1-Click Role Switcher */}
       <div className="rounded-2xl border border-[#262626] bg-[#121212] p-4 sm:p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3.5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1f1f1f] to-[#141414] text-[#f26223] border border-[#333] shadow-inner">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1f1f1f] to-[#141414] text-[#ff7900] border border-[#333] shadow-inner">
             <UserCheck className="h-6 w-6" />
           </div>
           <div>
@@ -349,7 +349,7 @@ export default function ApprovalsPage() {
             </div>
             <p className="text-base font-bold text-white flex items-center gap-2 mt-0.5">
               <span>{currentUser.incumbent_name}</span>
-              <span className="text-xs font-mono font-medium text-[#f26223]">
+              <span className="text-xs font-mono font-medium text-[#ff7900]">
                 ({currentUser.position_title})
               </span>
             </p>
@@ -386,8 +386,8 @@ export default function ApprovalsPage() {
                   }}
                   className={`rounded-lg px-2.5 py-1 text-[11px] font-mono transition cursor-pointer ${
                     isActive
-                      ? 'bg-[#f26223] text-white font-bold shadow-md shadow-[#f26223]/20'
-                      : 'border border-[#333] bg-[#171717] text-[#a1a1aa] hover:border-[#f26223]/50 hover:text-white'
+                      ? 'bg-[#ff7900] text-white font-bold shadow-md shadow-[#ff7900]/20'
+                      : 'border border-[#333] bg-[#171717] text-[#a1a1aa] hover:border-[#ff7900]/50 hover:text-white'
                   }`}
                 >
                   {label}
@@ -438,7 +438,7 @@ export default function ApprovalsPage() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold font-mono transition whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'bg-[#f26223] text-white shadow-md shadow-[#f26223]/20 font-bold'
+                    ? 'bg-[#ff7900] text-white shadow-md shadow-[#ff7900]/20 font-bold'
                     : 'text-[#a1a1aa] hover:bg-[#141414] hover:text-white'
                 }`}
               >
@@ -446,7 +446,7 @@ export default function ApprovalsPage() {
                 {tab.count > 0 && (
                   <span
                     className={`flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-mono ${
-                      isActive ? 'bg-white text-[#f26223] font-bold' : 'bg-[#222] text-[#888]'
+                      isActive ? 'bg-white text-[#ff7900] font-bold' : 'bg-[#222] text-[#888]'
                     }`}
                   >
                     {tab.count}
@@ -472,7 +472,7 @@ export default function ApprovalsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by Voucher ID (e.g. TXN-0016), title, person responsible, or category..."
-            className="w-full rounded-xl border border-[#262626] bg-[#121212] pl-10 pr-4 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition font-sans"
+            className="w-full rounded-xl border border-[#262626] bg-[#121212] pl-10 pr-4 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#ff7900] focus:outline-none transition font-sans"
           />
           {searchQuery && (
             <button
@@ -488,7 +488,7 @@ export default function ApprovalsPage() {
           <select
             value={selectedEventFilter}
             onChange={(e) => setSelectedEventFilter(e.target.value)}
-            className="w-full rounded-xl border border-[#262626] bg-[#121212] px-3 py-2.5 text-xs text-white focus:border-[#f26223] focus:outline-none transition font-sans"
+            className="w-full rounded-xl border border-[#262626] bg-[#121212] px-3 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-sans"
           >
             <option value="ALL">All Designated Events</option>
             {distinctEvents.map(([id, name]) => (
@@ -519,10 +519,10 @@ export default function ApprovalsPage() {
           {activeTab === 'MY_ACTION' && allPendingCount > 0 && (
             <button
               onClick={() => setActiveTab('ALL_PENDING')}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-[#333] bg-[#1a1a1a] px-4 py-2 text-xs font-semibold text-white hover:border-[#f26223]/50 transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#333] bg-[#1a1a1a] px-4 py-2 text-xs font-semibold text-white hover:border-[#ff7900]/50 transition cursor-pointer"
             >
               <span>View All {allPendingCount} Pending Vouchers</span>
-              <ArrowRight className="h-3.5 w-3.5 text-[#f26223]" />
+              <ArrowRight className="h-3.5 w-3.5 text-[#ff7900]" />
             </button>
           )}
         </div>
@@ -549,7 +549,7 @@ export default function ApprovalsPage() {
             return (
               <div
                 key={tx.id}
-                className={`rounded-2xl border transition-all duration-200 bg-[#141414] shadow-sm hover:border-[#f26223]/50 ${
+                className={`rounded-2xl border transition-all duration-200 bg-[#141414] shadow-sm hover:border-[#ff7900]/50 ${
                   userCanSign && !isCompleted && !isRejected
                     ? 'border-[#00bb7f]/60 ring-1 ring-[#00bb7f]/20 bg-gradient-to-b from-[#141414] to-[#0d1612]'
                     : 'border-[#262626]'
@@ -560,7 +560,7 @@ export default function ApprovalsPage() {
                   <div className="flex flex-wrap items-center gap-2.5">
                     {/* Tracking ID with Copy */}
                     <div className="flex items-center gap-1 rounded-lg bg-[#1e1e1e] px-2.5 py-1 border border-[#333]">
-                      <span className="font-mono font-bold text-sm text-[#f26223]">
+                      <span className="font-mono font-bold text-sm text-[#ff7900]">
                         {tx.tracking_number || tx.transaction_id}
                       </span>
                       <button
@@ -590,7 +590,7 @@ export default function ApprovalsPage() {
                     {/* Wallet */}
                     {tx.wallet && (
                       <span className="rounded-md bg-[#1a1a1a] px-2 py-0.5 text-[11px] font-mono text-[#a1a1aa] border border-[#2a2a2a] flex items-center gap-1">
-                        <Wallet className="h-3 w-3 text-[#f26223]" />
+                        <Wallet className="h-3 w-3 text-[#ff7900]" />
                         {tx.wallet}
                       </span>
                     )}
@@ -611,8 +611,8 @@ export default function ApprovalsPage() {
                       </span>
                     )}
                     {isTier3 && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f26223]/15 px-3 py-1 text-xs font-mono font-bold text-[#f26223] border border-[#f26223]/30">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#f26223] animate-ping" />
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ff7900]/15 px-3 py-1 text-xs font-mono font-bold text-[#ff7900] border border-[#ff7900]/30">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#ff7900] animate-ping" />
                         Stage 3: Awaiting President Sign-Off
                       </span>
                     )}
@@ -704,7 +704,7 @@ export default function ApprovalsPage() {
                         t3Approval
                           ? 'bg-[#00bb7f]/10 border-[#00bb7f]/30 text-[#00bb7f]'
                           : isTier3
-                          ? 'bg-[#f26223]/10 border-[#f26223]/50 text-[#f26223] ring-1 ring-[#f26223]/30'
+                          ? 'bg-[#ff7900]/10 border-[#ff7900]/50 text-[#ff7900] ring-1 ring-[#ff7900]/30'
                           : 'bg-[#121212] border-[#222] text-[#555]'
                       }`}
                     >
@@ -713,7 +713,7 @@ export default function ApprovalsPage() {
                           {t3Approval ? (
                             <CheckCircle2 className="h-3.5 w-3.5 text-[#00bb7f]" />
                           ) : (
-                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#f26223] text-white text-[9px]">3</span>
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#ff7900] text-white text-[9px]">3</span>
                           )}
                           Stage 3: President
                         </span>
@@ -748,7 +748,7 @@ export default function ApprovalsPage() {
                         </div>
                         <div>
                           Claimant / Payee:{' '}
-                          <strong className="text-[#f26223] font-medium">
+                          <strong className="text-[#ff7900] font-medium">
                             {tx.person_responsible || tx.submitted_by_name}
                           </strong>
                         </div>
@@ -909,7 +909,7 @@ export default function ApprovalsPage() {
                                   setCurrentUser(recommendedProfile);
                                   showToast('info', `Switched review role to ${recommendedProfile.incumbent_name} to test approval.`);
                                 }}
-                                className="flex items-center gap-1.5 rounded-xl border border-[#f26223]/40 bg-[#f26223]/10 px-3.5 py-1.5 text-xs font-mono font-semibold text-[#f26223] hover:bg-[#f26223]/20 transition cursor-pointer"
+                                className="flex items-center gap-1.5 rounded-xl border border-[#ff7900]/40 bg-[#ff7900]/10 px-3.5 py-1.5 text-xs font-mono font-semibold text-[#ff7900] hover:bg-[#ff7900]/20 transition cursor-pointer"
                               >
                                 <RefreshCw className="h-3 w-3" />
                                 <span>Switch to {recommendedProfile.incumbent_name.split(' ')[0]}</span>
@@ -987,7 +987,7 @@ export default function ApprovalsPage() {
             {/* Document Preview Area */}
             <div className="rounded-xl border border-[#262626] bg-[#0c0c0c] p-6 text-center space-y-4">
               <div className="h-44 w-full rounded-lg bg-gradient-to-b from-[#181818] to-[#111] border border-dashed border-[#333] flex flex-col items-center justify-center p-4">
-                <FileText className="h-12 w-12 text-[#f26223] mb-2" />
+                <FileText className="h-12 w-12 text-[#ff7900] mb-2" />
                 <p className="text-sm font-bold text-white font-mono">
                   {selectedTxForProof.receipt_proof?.name || 'RECEIPT_ATTACHMENT.pdf'}
                 </p>

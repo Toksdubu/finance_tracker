@@ -287,10 +287,10 @@ export function OfficialFinanceSheet() {
 
         {/* Entries Count */}
         <div className="rounded-2xl border border-[#262626] bg-[#121212] p-4 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-[#f26223]/10 rounded-full blur-2xl group-hover:bg-[#f26223]/20 transition-all pointer-events-none" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-[#ff7900]/10 rounded-full blur-2xl group-hover:bg-[#ff7900]/20 transition-all pointer-events-none" />
           <div className="flex items-center justify-between text-[#a1a1aa] text-xs font-mono">
             <span>Logged Entries</span>
-            <Layers className="h-4 w-4 text-[#f26223]" />
+            <Layers className="h-4 w-4 text-[#ff7900]" />
           </div>
           <p className="text-2xl sm:text-3xl font-bold font-mono text-white mt-2">
             {displayRows.length} <span className="text-sm font-normal text-[#71717a]">/ {transactions.length}</span>
@@ -313,7 +313,7 @@ export function OfficialFinanceSheet() {
               placeholder="Search by ID, Description, Person, Receipt or Remarks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] pl-10 pr-4 py-2 text-xs font-mono text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition"
+              className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] pl-10 pr-4 py-2 text-xs font-mono text-white placeholder-[#555] focus:border-[#ff7900] focus:outline-none transition"
             />
             {searchQuery && (
               <button
@@ -329,7 +329,7 @@ export function OfficialFinanceSheet() {
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#f26223] to-[#ff7900] px-3.5 py-2 text-xs font-bold text-white shadow-lg shadow-[#f26223]/25 transition hover:brightness-110 active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#ff7900] to-[#ff7900] px-3.5 py-2 text-xs font-bold text-white shadow-lg shadow-[#ff7900]/25 transition hover:brightness-110 active:scale-95"
             >
               <PlusCircle className="h-4 w-4" />
               <span>Add Entry</span>
@@ -337,10 +337,10 @@ export function OfficialFinanceSheet() {
 
             <button
               onClick={handleExportCSV}
-              className="flex items-center gap-1.5 rounded-xl border border-[#333] bg-[#1a1a1a] px-3 py-2 text-xs font-semibold text-white transition hover:border-[#f26223]/50 hover:bg-[#222]"
+              className="flex items-center gap-1.5 rounded-xl border border-[#333] bg-[#1a1a1a] px-3 py-2 text-xs font-semibold text-white transition hover:border-[#ff7900]/50 hover:bg-[#222]"
               title="Download official CSV export matching the 13 columns"
             >
-              <Download className="h-3.5 w-3.5 text-[#f26223]" />
+              <Download className="h-3.5 w-3.5 text-[#ff7900]" />
               <span>Export CSV</span>
             </button>
 
@@ -362,14 +362,14 @@ export function OfficialFinanceSheet() {
         {/* Dropdown Filters */}
         <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#1f1f1f] text-xs font-mono">
           <span className="text-[#71717a] flex items-center gap-1 text-[11px]">
-            <Filter className="h-3 w-3 text-[#f26223]" /> Filters:
+            <Filter className="h-3 w-3 text-[#ff7900]" /> Filters:
           </span>
 
           {/* Type Filter */}
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as any)}
-            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#f26223]"
+            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#ff7900]"
           >
             <option value="ALL">Type: All</option>
             <option value="Income">Income (Green)</option>
@@ -380,7 +380,7 @@ export function OfficialFinanceSheet() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#f26223]"
+            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#ff7900]"
           >
             <option value="ALL">Category: All</option>
             {categoryOptions.map((cat) => (
@@ -394,7 +394,7 @@ export function OfficialFinanceSheet() {
           <select
             value={personFilter}
             onChange={(e) => setPersonFilter(e.target.value)}
-            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#f26223]"
+            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#ff7900]"
           >
             <option value="ALL">Person: All</option>
             {personOptions.map((p) => (
@@ -408,7 +408,7 @@ export function OfficialFinanceSheet() {
           <select
             value={verificationFilter}
             onChange={(e) => setVerificationFilter(e.target.value as any)}
-            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#f26223]"
+            className="rounded-lg border border-[#2b2b2b] bg-[#0c0c0c] px-2.5 py-1 text-xs text-white focus:outline-none focus:border-[#ff7900]"
           >
             <option value="ALL">Verification: All</option>
             <option value="Verified">Verified Only</option>
@@ -424,7 +424,7 @@ export function OfficialFinanceSheet() {
                 setVerificationFilter('ALL');
                 setSearchQuery('');
               }}
-              className="text-[#f26223] hover:underline text-[11px] ml-auto"
+              className="text-[#ff7900] hover:underline text-[11px] ml-auto"
             >
               Clear All Filters
             </button>
@@ -436,7 +436,7 @@ export function OfficialFinanceSheet() {
       <div className="rounded-2xl border border-[#262626] bg-[#0c0c0c] shadow-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono border-collapse select-text">
-            {/* Exact Orange Header Banner (#ff7900 / #f26223) with Bold White Text */}
+            {/* Exact Orange Header Banner (#ff7900 / #ff7900) with Bold White Text */}
             <thead>
               <tr className="bg-[#ff7900] text-white font-bold tracking-tight text-[12px] border-b-2 border-[#d96700]">
                 <th className="px-3.5 py-3 text-center border-r border-[#ea6f00] whitespace-nowrap">Date</th>
@@ -469,7 +469,7 @@ export function OfficialFinanceSheet() {
                         setPersonFilter('ALL');
                         setVerificationFilter('ALL');
                       }}
-                      className="mt-2 text-xs text-[#f26223] underline"
+                      className="mt-2 text-xs text-[#ff7900] underline"
                     >
                       Clear active filters
                     </button>
@@ -653,7 +653,7 @@ export function OfficialFinanceSheet() {
             <div className="rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#f26223]">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#ff7900]">
                     Document Name
                   </span>
                   <h4 className="text-base font-bold text-white mt-0.5 font-mono">
@@ -724,7 +724,7 @@ export function OfficialFinanceSheet() {
               </button>
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#f26223] to-[#ff7900] px-4 py-2 text-xs font-bold text-white shadow-lg hover:brightness-110"
+                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#ff7900] to-[#ff7900] px-4 py-2 text-xs font-bold text-white shadow-lg hover:brightness-110"
               >
                 <Printer className="h-3.5 w-3.5" />
                 <span>Print Voucher</span>
@@ -740,7 +740,7 @@ export function OfficialFinanceSheet() {
           <div className="relative w-full max-w-xl rounded-2xl border border-[#333] bg-[#141414] p-6 shadow-2xl space-y-5 my-8">
             <div className="flex items-center justify-between border-b border-[#262626] pb-3">
               <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f26223]/15 text-[#f26223] border border-[#f26223]/30">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#ff7900]/15 text-[#ff7900] border border-[#ff7900]/30">
                   <PlusCircle className="h-4 w-4" />
                 </span>
                 <div>
@@ -770,7 +770,7 @@ export function OfficialFinanceSheet() {
                     value={newDate}
                     onChange={(e) => setNewDate(e.target.value)}
                     placeholder="e.g. September 22, 2026"
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                     required
                   />
                 </div>
@@ -812,7 +812,7 @@ export function OfficialFinanceSheet() {
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                   >
                     {categoryOptions.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -832,7 +832,7 @@ export function OfficialFinanceSheet() {
                     placeholder="0.00"
                     value={newAmount}
                     onChange={(e) => setNewAmount(e.target.value)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white font-bold focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white font-bold focus:border-[#ff7900] focus:outline-none"
                     required
                   />
                 </div>
@@ -846,7 +846,7 @@ export function OfficialFinanceSheet() {
                   placeholder="e.g. Tarpaulin Printing or Alumni Donation"
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
-                  className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                  className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                   required
                 />
               </div>
@@ -858,7 +858,7 @@ export function OfficialFinanceSheet() {
                   <select
                     value={newPerson}
                     onChange={(e) => setNewPerson(e.target.value)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                   >
                     {personOptions.map((p) => (
                       <option key={p} value={p}>{p}</option>
@@ -874,7 +874,7 @@ export function OfficialFinanceSheet() {
                     placeholder="e.g. TARPAULIN RECEIPT"
                     value={newReceiptName}
                     onChange={(e) => setNewReceiptName(e.target.value)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white uppercase focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white uppercase focus:border-[#ff7900] focus:outline-none"
                   />
                 </div>
               </div>
@@ -888,7 +888,7 @@ export function OfficialFinanceSheet() {
                     placeholder="Received / Sent / Spent"
                     value={newRemarks}
                     onChange={(e) => setNewRemarks(e.target.value)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                   />
                 </div>
 
@@ -898,7 +898,7 @@ export function OfficialFinanceSheet() {
                   <select
                     value={newWallet}
                     onChange={(e) => setNewWallet(e.target.value as any)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                   >
                     <option value="GCASH">GCash</option>
                     <option value="GOTYME">GoTyme Bank</option>
@@ -915,7 +915,7 @@ export function OfficialFinanceSheet() {
                   <select
                     value={newVerification}
                     onChange={(e) => setNewVerification(e.target.value as any)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                   >
                     <option value="Verified">Verified</option>
                     <option value="Pending">Pending</option>
@@ -928,7 +928,7 @@ export function OfficialFinanceSheet() {
                   <select
                     value={newEntryStatus}
                     onChange={(e) => setNewEntryStatus(e.target.value as any)}
-                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#f26223] focus:outline-none"
+                    className="w-full rounded-xl border border-[#2b2b2b] bg-[#0c0c0c] px-3 py-2 text-white focus:border-[#ff7900] focus:outline-none"
                   >
                     <option value="Complete">Complete (Green)</option>
                     <option value="Pending">Pending</option>
@@ -946,7 +946,7 @@ export function OfficialFinanceSheet() {
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-gradient-to-r from-[#f26223] to-[#ff7900] px-5 py-2 text-xs font-bold text-white shadow-lg hover:brightness-110"
+                  className="rounded-xl bg-gradient-to-r from-[#ff7900] to-[#ff7900] px-5 py-2 text-xs font-bold text-white shadow-lg hover:brightness-110"
                 >
                   Insert Transaction Row
                 </button>

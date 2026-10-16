@@ -239,15 +239,9 @@ export default function AiCopilotPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: `Hello ${currentUser.incumbent_name}! I am your **PUP ACCESS Chief Financial Strategist & Intelligence AI**, connected live to your organization's treasury ledger.
+      content: `Hi **${currentUser?.incumbent_name ? currentUser.incumbent_name.split(' ')[0] : 'there'}**! 👋 I'm your ACCESS Financial AI Strategist.
 
-I have real-time visibility over your:
-* **Official Central Ledger** (Net Balance: **₱${(netTrackerBalance ?? 5229.98).toLocaleString('en-US', { minimumFractionDigits: 2 })}**)
-* **Custody Wallets** (GCash: ₱${(walletTotals?.gcash?.balance ?? 39760.43).toLocaleString('en-US', { minimumFractionDigits: 2 })}, GoTyme: ₱${(walletTotals?.gotyme?.balance ?? 8401.73).toLocaleString('en-US', { minimumFractionDigits: 2 })})
-* **Event Budget Envelopes** (Computer Engineering Month, Hardhatting, Sportsfest)
-* **3-Tier Approval Pipeline** (${transactions.filter((t) => t.status.includes('PENDING')).length} vouchers pending)
-
-How can I assist your treasury team today? You can ask for burn rate analyses, event budgeting splits (Zero-Based or Activity-Based), anomaly audits, or executive board reports.`,
+I'm connected live to your organization's treasury ledger and custody wallets. What would you like to explore today?`,
       timestamp: 'Just now',
       model: 'gemini-3.5-flash',
     },
@@ -285,11 +279,15 @@ How can I assist your treasury team today? You can ask for burn rate analyses, e
 
   const handleClearChat = () => {
     if (confirm('Are you sure you want to clear the conversation history?')) {
+      const name = currentUser?.incumbent_name ? currentUser.incumbent_name.split(' ')[0] : 'there';
       setMessages([
         {
           role: 'assistant',
-          content: 'Conversation cleared. What financial queries or budgeting strategies would you like to explore?',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          content: `Hi **${name}**! 👋 Conversation reset.
+
+I'm ready whenever you are. What would you like to explore or audit next?`,
+          timestamp: 'Just now',
+          model: 'gemini-3.5-flash',
         },
       ]);
     }
@@ -407,27 +405,69 @@ How can I assist your treasury team today? You can ask for burn rate analyses, e
     },
   ];
 
+  // Starter prompt cards displayed cleanly when conversation is on welcome state
+  const starterCards = [
+    {
+      title: 'Cash Flow & Liquidity',
+      description: 'Review net balance across GCash, GoTyme & custody vaults',
+      query: 'Analyze our current liquidity, burn rate across active events, and remaining vault funds in detail.',
+      icon: <TrendingUp className="h-4 w-4 text-[#00bb7f]" />,
+      badge: 'Ledger Audit',
+    },
+    {
+      title: 'Audit Pending Vouchers',
+      description: 'Inspect vouchers awaiting sign-offs and verify documentation',
+      query: 'Check all pending vouchers awaiting approval. Are there any anomalies, budget overruns, or missing receipts?',
+      icon: <ShieldAlert className="h-4 w-4 text-[#ff7900]" />,
+      badge: 'Compliance',
+    },
+    {
+      title: 'Plan Event Budget',
+      description: 'Calculate 70/20/10 split, activity lines, & cost-per-head',
+      query: 'How should we structure the budget allocation for upcoming events using Activity-Based Costing and 70/20/10 envelope splits?',
+      icon: <PieChart className="h-4 w-4 text-[#38bdf8]" />,
+      badge: 'Planning',
+    },
+    {
+      title: 'Executive Board Report',
+      description: 'Draft a formal treasury summary for leadership review',
+      query: 'Draft a formal Executive Board Treasury Summary for President Sophia Lim and Treasurer Daniel Bithao.',
+      icon: <Zap className="h-4 w-4 text-[#a855f7]" />,
+      badge: 'Summary',
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header Banner */}
       <div className="border-b border-[#262626] pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#ff7900] animate-pulse" />
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#ff7900]">
-              Real-Time Decision Intelligence
-            </span>
-            <span className="rounded-full bg-[#00bb7f]/15 text-[#00bb7f] border border-[#00bb7f]/30 px-2 py-0.5 text-[10px] font-mono font-bold flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#00bb7f]" />
-              Live Gemini 3.5 Engine
-            </span>
+        <div className="flex items-center gap-4">
+          <div className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-2xl overflow-hidden border-2 border-[#ff7900] shadow-xl shadow-[#ff7900]/25 flex-shrink-0 bg-[#161616] group">
+            <img
+              src="/ai-avatar.png"
+              alt="PUP ACCESS Chief Financial AI Strategist"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full bg-[#00bb7f] border-2 border-[#0a0a0a]" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-mono flex items-center gap-3">
-            Financial AI Strategist
-          </h1>
-          <p className="text-xs sm:text-sm text-[#a1a1aa] mt-1 font-sans max-w-2xl">
-            Live conversational treasury intelligence powered by Google Gemini. Query real ledger balances, audit pending disbursements, and calculate Activity-Based & Zero-Based budget models.
-          </p>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#ff7900] animate-pulse" />
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#ff7900]">
+                Real-Time Decision Intelligence
+              </span>
+              <span className="rounded-full bg-[#00bb7f]/15 text-[#00bb7f] border border-[#00bb7f]/30 px-2 py-0.5 text-[10px] font-mono font-bold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#00bb7f]" />
+                Live Gemini 3.5 Engine
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-mono flex items-center gap-3">
+              Financial AI Strategist
+            </h1>
+            <p className="text-xs sm:text-sm text-[#a1a1aa] mt-1 font-sans max-w-2xl">
+              Live conversational treasury intelligence powered by Google Gemini. Query real ledger balances, audit pending disbursements, and calculate Activity-Based & Zero-Based budget models.
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -688,8 +728,13 @@ How can I assist your treasury team today? You can ask for burn rate analyses, e
           {/* Header */}
           <div className="border-b border-[#262626] bg-[#101010] p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#ff7900] to-[#f26223] text-white shadow-md shadow-[#ff7900]/25">
-                <Bot className="h-5 w-5" />
+              <div className="relative h-10 w-10 rounded-xl overflow-hidden border-2 border-[#ff7900] shadow-md shadow-[#ff7900]/25 flex-shrink-0 bg-[#161616]">
+                <img
+                  src="/ai-avatar.png"
+                  alt="PUP ACCESS Financial AI Strategist"
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-[#00bb7f] border-2 border-[#101010]" />
               </div>
               <div>
                 <h3 className="text-xs font-bold text-white font-mono flex items-center gap-2">
@@ -708,26 +753,39 @@ How can I assist your treasury team today? You can ask for burn rate analyses, e
               <span className="hidden sm:inline-block rounded-md border border-[#333] bg-[#1a1a1a] px-2 py-0.5 text-[10px] font-mono text-[#a1a1aa]">
                 Gemini 3.5 Active
               </span>
+              {messages.length > 1 && (
+                <button
+                  type="button"
+                  onClick={handleClearChat}
+                  className="flex items-center gap-1.5 rounded-lg border border-[#333] bg-[#161616] hover:bg-[#202020] px-2.5 py-1 text-[10px] font-mono text-[#a1a1aa] hover:text-white transition cursor-pointer"
+                  title="Start a new chat session"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  <span className="hidden sm:inline">New Chat</span>
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Quick Action Prompt Chips */}
-          <div className="px-3.5 py-2 border-b border-[#222] bg-[#0c0c0c] flex items-center gap-2 overflow-x-auto text-[11px] font-mono scrollbar-none">
-            <span className="text-[#555] shrink-0 flex items-center gap-1">
-              <Zap className="h-3 w-3 text-[#ff7900]" />
-              Quick:
-            </span>
-            {quickPrompts.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => handleSendMessage(p.query)}
-                disabled={loading}
-                className="rounded-lg border border-[#2a2a2a] bg-[#161616] px-2.5 py-1 text-[#a1a1aa] hover:text-white hover:border-[#ff7900]/50 shrink-0 transition cursor-pointer disabled:opacity-50"
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+          {/* Quick Action Prompt Chips (shown when actively chatting) */}
+          {messages.length > 1 && (
+            <div className="px-3.5 py-2 border-b border-[#222] bg-[#0c0c0c] flex items-center gap-2 overflow-x-auto text-[11px] font-mono scrollbar-none">
+              <span className="text-[#555] shrink-0 flex items-center gap-1">
+                <Zap className="h-3 w-3 text-[#ff7900]" />
+                Quick:
+              </span>
+              {quickPrompts.map((p, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSendMessage(p.query)}
+                  disabled={loading}
+                  className="rounded-lg border border-[#2a2a2a] bg-[#161616] px-2.5 py-1 text-[#a1a1aa] hover:text-white hover:border-[#ff7900]/50 shrink-0 transition cursor-pointer disabled:opacity-50"
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Chat Messages Body */}
           <div ref={chatScrollRef} className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
@@ -736,8 +794,12 @@ How can I assist your treasury team today? You can ask for burn rate analyses, e
               return (
                 <div key={idx} className={`flex gap-3 text-xs leading-relaxed ${isUser ? 'justify-end' : 'justify-start'}`}>
                   {!isUser && (
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#222] text-[#ff7900] border border-[#333] mt-1">
-                      <Bot className="h-4 w-4" />
+                    <div className="relative h-8 w-8 rounded-xl overflow-hidden border border-[#ff7900]/40 flex-shrink-0 shadow-sm mt-0.5 bg-[#161616]">
+                      <img
+                        src="/ai-avatar.png"
+                        alt="AI Strategist"
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                   )}
 
@@ -791,9 +853,56 @@ How can I assist your treasury team today? You can ask for burn rate analyses, e
               );
             })}
 
+            {/* Starter Suggestion Cards shown only on welcome state */}
+            {messages.length === 1 && !loading && (
+              <div className="pt-2 pb-1 space-y-3">
+                <div className="flex items-center gap-2 text-[11px] font-mono text-[#71717a] px-0.5">
+                  <Sparkles className="h-3.5 w-3.5 text-[#ff7900]" />
+                  <span>Suggested queries & audits:</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {starterCards.map((card, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleSendMessage(card.query)}
+                      className="group flex flex-col justify-between p-3.5 rounded-xl border border-[#262626] bg-[#0f0f0f] hover:bg-[#181818] hover:border-[#ff7900]/50 transition duration-200 text-left cursor-pointer shadow-sm relative overflow-hidden"
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2 w-full">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] group-hover:border-[#ff7900]/40 transition">
+                            {card.icon}
+                          </div>
+                          <span className="text-xs font-bold text-white group-hover:text-[#ff7900] transition">
+                            {card.title}
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded bg-[#1e1e1e] text-[#888] border border-[#2a2a2a]">
+                          {card.badge}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#888] group-hover:text-[#aaa] transition leading-relaxed">
+                        {card.description}
+                      </p>
+                      <div className="mt-2.5 flex items-center gap-1 text-[10px] font-mono text-[#555] group-hover:text-[#ff7900] transition">
+                        <span>Run prompt</span>
+                        <ArrowRight className="h-2.5 w-2.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {loading && (
               <div className="flex items-center gap-3 text-xs text-[#a1a1aa] font-mono bg-[#0c0c0c] p-3.5 rounded-xl border border-[#222] w-fit animate-pulse">
-                <Sparkles className="h-4 w-4 text-[#ff7900] animate-spin" />
+                <div className="h-6 w-6 rounded-lg overflow-hidden border border-[#ff7900]/50 flex-shrink-0">
+                  <img
+                    src="/ai-avatar.png"
+                    alt="AI Thinking"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
                 <span>Google Gemini 3.5 is analyzing PUP ACCESS ledger records and calculating strategy...</span>
               </div>
             )}

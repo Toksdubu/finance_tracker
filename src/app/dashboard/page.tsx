@@ -50,8 +50,8 @@ export default function DashboardOverviewPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#262626] pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="h-2 w-2 rounded-full bg-[#f26223]" />
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#f26223]">
+            <span className="h-2 w-2 rounded-full bg-[#ff7900]" />
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#ff7900]">
               PUP ACCESS Financial Command Hub
             </span>
           </div>
@@ -66,14 +66,14 @@ export default function DashboardOverviewPage() {
         <div className="flex items-center gap-2.5">
           <Link
             href="/dashboard/expenses/new"
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f26223] to-[#ff6b35] px-4 py-2 text-xs font-bold text-white shadow-lg shadow-[#f26223]/25 transition hover:brightness-110"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#ff7900] to-[#ff6b35] px-4 py-2 text-xs font-bold text-white shadow-lg shadow-[#ff7900]/25 transition hover:brightness-110"
           >
             <PlusCircle className="h-4 w-4" />
             <span>Submit Voucher</span>
           </Link>
           <Link
             href="/dashboard/approvals"
-            className="flex items-center gap-2 rounded-xl border border-[#333] bg-[#141414] px-4 py-2 text-xs font-semibold text-white transition hover:border-[#f26223]/50"
+            className="flex items-center gap-2 rounded-xl border border-[#333] bg-[#141414] px-4 py-2 text-xs font-semibold text-white transition hover:border-[#ff7900]/50"
           >
             <span>Approvals ({totalPending})</span>
           </Link>
@@ -84,7 +84,7 @@ export default function DashboardOverviewPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#a1a1aa] flex items-center gap-1.5">
-            <CreditCard className="h-3.5 w-3.5 text-[#f26223]" />
+            <CreditCard className="h-3.5 w-3.5 text-[#ff7900]" />
             Active Custody Wallets & Balances
           </h2>
           <span className="text-[11px] font-mono text-[#71717a]">
@@ -152,13 +152,13 @@ export default function DashboardOverviewPage() {
             onClick={() => setSelectedWalletFilter(selectedWalletFilter === 'CASH_ON_HAND' ? 'ALL' : 'CASH_ON_HAND')}
             className={`rounded-2xl border p-4 transition cursor-pointer ${
               selectedWalletFilter === 'CASH_ON_HAND'
-                ? 'border-[#f26223] bg-[#f26223]/10 shadow-lg shadow-[#f26223]/10'
+                ? 'border-[#ff7900] bg-[#ff7900]/10 shadow-lg shadow-[#ff7900]/10'
                 : 'border-[#262626] bg-[#141414] hover:border-[#333]'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#f26223]/20 text-[#f26223] font-bold text-xs">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ff7900]/20 text-[#ff7900] font-bold text-xs">
                   ₱
                 </div>
                 <span className="text-xs font-bold text-white font-mono">Cash on Hand</span>
@@ -182,10 +182,10 @@ export default function DashboardOverviewPage() {
         <div className="rounded-2xl border border-[#262626] bg-[#141414] p-4 space-y-2 font-mono">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-white flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#f26223]" />
+              <span className="h-2 w-2 rounded-full bg-[#ff7900]" />
               Sports Team Quota Collections
             </span>
-            <span className="rounded bg-[#f26223]/15 px-2 py-0.5 text-[10px] font-semibold text-[#f26223] border border-[#f26223]/30">
+            <span className="rounded bg-[#ff7900]/15 px-2 py-0.5 text-[10px] font-semibold text-[#ff7900] border border-[#ff7900]/30">
               Left: {formatCurrency(fundingSourceTotals.quota.balance)}
             </span>
           </div>
@@ -225,7 +225,7 @@ export default function DashboardOverviewPage() {
       {/* Event Quota & Category Breakdown Summary (Replicating ACCESS right-hand table) */}
       <div className="rounded-2xl border border-[#262626] bg-[#141414] p-5 space-y-4">
         <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-          <Layers className="h-4 w-4 text-[#f26223]" />
+          <Layers className="h-4 w-4 text-[#ff7900]" />
           Event Quota per Category Structure (Activity-Based Summary)
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono text-xs">
