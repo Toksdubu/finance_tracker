@@ -15,6 +15,10 @@ import {
   AlertCircle,
   FileText,
   CheckCircle2,
+  Zap,
+  Tag,
+  CreditCard,
+  Building,
 } from 'lucide-react';
 import { ReceiptType, TransactionType } from '@/types/finance';
 
@@ -35,12 +39,13 @@ export default function NewExpensePage() {
   // Payee Sensitive Info
   const [payeeName, setPayeeName] = useState(currentUser.incumbent_name);
   const [accountType, setAccountType] = useState<'GCASH' | 'LANDBANK' | 'BDO' | 'OTHER_BANK' | 'CASH'>('GCASH');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [accountNumber, setAccountNumber] = useState('0917-555-0192');
+  const [privacyConsent, setPrivacyConsent] = useState(true);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Spreadsheet-Aligned Practical Fields
   const [wallet, setWallet] = useState<'GCASH' | 'GOTYME' | 'CASH_ON_HAND' | 'LANDBANK'>('GCASH');
-  const [fundingSource, setFundingSource] = useState<'QUOTA' | 'PARTNERSHIP_SPONSOR' | 'ACCESS_GENERAL_FUNDS'>('QUOTA');
+  const [fundingSource, setFundingSource] = useState<'QUOTA' | 'PARTNERSHIP_SPONSOR' | 'ACCESS_GENERAL_FUNDS'>('ACCESS_GENERAL_FUNDS');
   const [remarks, setRemarks] = useState('');
   const [reimbursementNotes, setReimbursementNotes] = useState('');
 
@@ -50,6 +55,7 @@ export default function NewExpensePage() {
     compressedSize: number;
     savingsPct: number;
     fileName: string;
+    previewUrl?: string;
   } | null>(null);
   const [aiExtracting, setAiExtracting] = useState(false);
   const [aiExtractedData, setAiExtractedData] = useState<{
@@ -64,6 +70,39 @@ export default function NewExpensePage() {
     ? activeCategory.allocated_amount - activeCategory.spent_amount
     : 0;
 
+  // Quick fill template helper for fast testing
+  const handleQuickFill = (template: {
+    title: string;
+    amount: string;
+    category: string;
+    vendor: string;
+    or: string;
+    wallet: 'GCASH' | 'GOTYME' | 'CASH_ON_HAND';
+  }) => {
+    setTitle(template.title);
+    setAmount(template.amount);
+    setRemarks(`Procured for ${template.title} / Verified receipt`);
+    setWallet(template.wallet);
+    setCompressionResult({
+      originalSize: 4.8 * 1024 * 1024,
+      compressedSize: 142 * 1024,
+      savingsPct: 97,
+      fileName: `${template.title.toLowerCase().replace(/\s+/g, '_')}_receipt.pdf`,
+    });
+    setAiExtractedData({
+      vendor: template.vendor,
+      orNumber: template.or,
+      lineItems: [
+        {
+          name: template.title,
+          quantity: 1,
+          unit_price: parseFloat(template.amount),
+          total: parseFloat(template.amount),
+        },
+      ],
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -71,11 +110,13 @@ export default function NewExpensePage() {
     try {
       // In-browser WebP compression
       const res = await compressReceiptImage(file);
+      const previewUrl = URL.createObjectURL(file);
       setCompressionResult({
         originalSize: res.originalSize,
         compressedSize: res.compressedSize,
         savingsPct: res.savingsPct,
         fileName: file.name,
+        previewUrl,
       });
 
       // Simulate instant multimodal AI OCR Extraction
@@ -86,10 +127,15 @@ export default function NewExpensePage() {
           vendor: 'Pureza Print & Engineering Collaterals',
           orNumber: `OR-${Math.floor(10000 + Math.random() * 90000)}`,
           lineItems: [
-            { name: title || 'Department Event Procurement', quantity: 1, unit_price: parseFloat(amount) || 2500, total: parseFloat(amount) || 2500 },
+            {
+              name: title || 'Department Event Procurement',
+              quantity: 1,
+              unit_price: parseFloat(amount) || 1250,
+              total: parseFloat(amount) || 1250,
+            },
           ],
         });
-      }, 1200);
+      }, 1000);
     } catch (err) {
       console.error('Compression failed:', err);
     }
@@ -97,14 +143,16 @@ export default function NewExpensePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+
     if (!privacyConsent) {
-      alert('You must accept the Data Privacy Act consent before submitting disbursement details.');
+      setFormError('Please accept the Data Privacy Act agreement before submitting.');
       return;
     }
 
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
-      alert('Please enter a valid amount.');
+      setFormError('Please enter a valid disbursement amount greater than ₱0.00.');
       return;
     }
 
@@ -133,31 +181,85 @@ export default function NewExpensePage() {
       accountNumber,
     });
 
-    router.push('/dashboard');
+    // Navigate to Approvals page so they see their new voucher right at Step 1
+    router.push('/dashboard/approvals');
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      <div className="border-b border-[#262626] pb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="h-2 w-2 rounded-full bg-[#f26223]" />
-          <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#f26223]">
-            Expenditure Intake Pipeline
-          </span>
+    <div className="max-w-3xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="border-b border-[#262626] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ff7900]" />
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#ff7900]">
+              Disbursement Intake Desk
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-mono">
+            Submit Expense Voucher
+          </h1>
+          <p className="text-xs sm:text-sm text-[#a1a1aa] mt-1">
+            Submit receipts for reimbursement or direct vendor payments through the 3-stage executive approval process.
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
-          Submit Expense Voucher
-        </h1>
-        <p className="text-xs sm:text-sm text-[#a1a1aa] mt-1">
-          Upload receipt proof, auto-compute line items, and submit for 3-tier executive approval.
-        </p>
+
+        {/* Quick Demo Template Helpers */}
+        <div className="flex flex-col items-start sm:items-end gap-1.5">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[#71717a] flex items-center gap-1">
+            <Zap className="h-3 w-3 text-[#ff7900]" />
+            Quick Prefill Sample:
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() =>
+                handleQuickFill({
+                  title: 'Bulwagang Balagtas Audio Cable',
+                  amount: '450.00',
+                  category: 'Event Expenses',
+                  vendor: 'Raon Sound Electronics',
+                  or: 'OR-89412',
+                  wallet: 'GOTYME',
+                })
+              }
+              className="rounded-lg border border-[#333] bg-[#141414] hover:bg-[#1f1f1f] px-2.5 py-1 text-[11px] font-mono text-[#a1a1aa] hover:text-white transition cursor-pointer"
+            >
+              Audio Cable (₱450)
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                handleQuickFill({
+                  title: 'Whiteboard Markers & Erasers',
+                  amount: '280.00',
+                  category: 'Supplies',
+                  vendor: 'National Book Store Pureza',
+                  or: 'OR-55102',
+                  wallet: 'GCASH',
+                })
+              }
+              className="rounded-lg border border-[#333] bg-[#141414] hover:bg-[#1f1f1f] px-2.5 py-1 text-[11px] font-mono text-[#a1a1aa] hover:text-white transition cursor-pointer"
+            >
+              Markers (₱280)
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Form Error Alert */}
+      {formError && (
+        <div className="rounded-xl border border-[#fb2c36]/40 bg-[#fb2c36]/10 p-3.5 text-xs text-[#fb2c36] flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <span>{formError}</span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Step 1: Event & Envelope Allocation */}
         <div className="rounded-2xl border border-[#262626] bg-[#141414] p-5 space-y-4">
           <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#f26223] text-white text-xs">1</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ff7900] text-white text-xs font-bold">1</span>
             Target Event & Category Envelope
           </h2>
 
@@ -171,7 +273,7 @@ export default function NewExpensePage() {
                   const ev = events.find((x) => x.id === e.target.value);
                   if (ev && ev.categories[0]) setSelectedCategoryId(ev.categories[0].id);
                 }}
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition font-sans"
+                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-sans"
               >
                 {events.map((e) => (
                   <option key={e.id} value={e.id}>
@@ -188,7 +290,7 @@ export default function NewExpensePage() {
               <select
                 value={selectedCategoryId}
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition font-sans"
+                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-sans"
               >
                 {activeEvent?.categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -213,7 +315,7 @@ export default function NewExpensePage() {
         {/* Step 2: Voucher Information */}
         <div className="rounded-2xl border border-[#262626] bg-[#141414] p-5 space-y-4">
           <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#f26223] text-white text-xs">2</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ff7900] text-white text-xs font-bold">2</span>
             Voucher Details & Amount
           </h2>
 
@@ -226,22 +328,25 @@ export default function NewExpensePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Bulk Procurement of Hardhat Safety Gear"
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition font-sans"
+                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#ff7900] focus:outline-none transition font-sans"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-medium text-[#a1a1aa] mb-1.5">Claimed Total Amount (PHP)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  required
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition font-mono font-bold"
-                />
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-sm text-[#71717a]">₱</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] pl-8 pr-3.5 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#ff7900] focus:outline-none transition font-mono font-bold"
+                  />
+                </div>
               </div>
 
               <div>
@@ -249,7 +354,7 @@ export default function NewExpensePage() {
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value as any)}
-                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition"
+                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition"
                 >
                   <option value="REIMBURSEMENT">Reimbursement (Claim after paying)</option>
                   <option value="DISBURSEMENT">Direct Vendor Disbursement</option>
@@ -262,7 +367,7 @@ export default function NewExpensePage() {
                 <select
                   value={receiptType}
                   onChange={(e) => setReceiptType(e.target.value as any)}
-                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition"
+                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition"
                 >
                   <option value="OFFICIAL_RECEIPT_SI">BIR Official Receipt / Invoice</option>
                   <option value="ACKNOWLEDGMENT_RECEIPT">Acknowledgment Receipt (AR)</option>
@@ -277,7 +382,7 @@ export default function NewExpensePage() {
                 <select
                   value={wallet}
                   onChange={(e) => setWallet(e.target.value as any)}
-                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition font-mono"
+                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-mono"
                 >
                   <option value="GCASH">GCASH (Primary Disbursement)</option>
                   <option value="GOTYME">GoTyme Bank (Court & Reserves)</option>
@@ -291,11 +396,11 @@ export default function NewExpensePage() {
                 <select
                   value={fundingSource}
                   onChange={(e) => setFundingSource(e.target.value as any)}
-                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition font-mono"
+                  className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-mono"
                 >
+                  <option value="ACCESS_GENERAL_FUNDS">ACCESS (Organization General Funds)</option>
                   <option value="QUOTA">QUOTA (Sports / Team Collections)</option>
                   <option value="PARTNERSHIP_SPONSOR">PARTNERSHIP (Sponsors / Bettermind)</option>
-                  <option value="ACCESS_GENERAL_FUNDS">ACCESS (Organization General Funds)</option>
                 </select>
               </div>
             </div>
@@ -306,19 +411,8 @@ export default function NewExpensePage() {
                 type="text"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                placeholder="e.g. Court booking paid by Kuya Allan / Ref lunch message from kuya Dale"
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition font-sans"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-[#a1a1aa] mb-1.5">Business Purpose & Committee Deliverable</label>
-              <textarea
-                rows={2}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Explain the necessity of this expense for the student body or event execution..."
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] p-3 text-xs text-white placeholder-[#555] focus:border-[#f26223] focus:outline-none transition"
+                placeholder="e.g. Paid via GCash / Audio patch cables for stage setup"
+                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white placeholder-[#555] focus:border-[#ff7900] focus:outline-none transition font-sans"
               />
             </div>
           </div>
@@ -328,16 +422,16 @@ export default function NewExpensePage() {
         <div className="rounded-2xl border border-[#262626] bg-[#141414] p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#f26223] text-white text-xs">3</span>
-              Receipt Upload & AI Math Scan
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ff7900] text-white text-xs font-bold">3</span>
+              Receipt Upload & Optical Scan
             </h2>
             <span className="text-[10px] font-mono text-[#00bb7f] flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
-              In-Browser WebP Compression Active
+              In-Browser Compression
             </span>
           </div>
 
-          <div className="rounded-xl border-2 border-dashed border-[#2a2a2a] bg-[#0c0c0c] p-6 text-center hover:border-[#f26223]/50 transition">
+          <div className="rounded-xl border-2 border-dashed border-[#2a2a2a] bg-[#0c0c0c] p-6 text-center hover:border-[#ff7900]/50 transition cursor-pointer">
             <input
               type="file"
               accept="image/*,application/pdf"
@@ -349,7 +443,7 @@ export default function NewExpensePage() {
               <Upload className="mx-auto h-8 w-8 text-[#71717a] mb-2" />
               <p className="text-xs font-bold text-white font-mono">Click to upload receipt photo or PDF</p>
               <p className="text-[11px] text-[#71717a] mt-1">
-                Smartphone photos (5MB–10MB) are automatically compressed to ~150KB WebP for $0 storage.
+                Smartphone photos (5MB–10MB) are automatically compressed for fast loading.
               </p>
             </label>
           </div>
@@ -372,7 +466,7 @@ export default function NewExpensePage() {
           {aiExtracting && (
             <div className="rounded-xl border border-[#3080ff]/30 bg-[#3080ff]/10 p-3 text-xs font-mono text-[#3080ff] flex items-center gap-2">
               <Sparkles className="h-4 w-4 animate-spin" />
-              <span>Google Gemini analyzing line items and verifying mathematical sum...</span>
+              <span>Scanning receipt line items and verifying mathematical sum...</span>
             </div>
           )}
 
@@ -380,7 +474,7 @@ export default function NewExpensePage() {
             <div className="rounded-xl border border-[#00bb7f]/30 bg-[#00bb7f]/10 p-3 text-xs font-mono text-[#00bb7f] space-y-1">
               <p className="font-bold flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5" />
-                AI Line-Item Verification Passed
+                Line-Item Verification Passed
               </p>
               <p className="text-[11px] text-[#a1a1aa]">
                 Detected Merchant: <strong className="text-white">{aiExtractedData.vendor}</strong> | OR: <strong className="text-white">{aiExtractedData.orNumber}</strong>
@@ -389,16 +483,16 @@ export default function NewExpensePage() {
           )}
         </div>
 
-        {/* Step 4: Payee & Payout Details (Encrypted AES-256-GCM) */}
+        {/* Step 4: Payee & Payout Details */}
         <div className="rounded-2xl border border-[#262626] bg-[#141414] p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#f26223] text-white text-xs">4</span>
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#ff7900] text-white text-xs font-bold">4</span>
               Disbursement Payment Target
             </h2>
-            <span className="text-[10px] font-mono text-[#f26223] flex items-center gap-1 border border-[#f26223]/30 bg-[#f26223]/10 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-mono text-[#00bb7f] flex items-center gap-1 border border-[#00bb7f]/30 bg-[#00bb7f]/10 px-2 py-0.5 rounded">
               <Lock className="h-3 w-3" />
-              AES-256-GCM Encrypted
+              Secure Payee Target
             </span>
           </div>
 
@@ -410,7 +504,7 @@ export default function NewExpensePage() {
                 required
                 value={payeeName}
                 onChange={(e) => setPayeeName(e.target.value)}
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition"
+                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-sans"
               />
             </div>
 
@@ -419,7 +513,7 @@ export default function NewExpensePage() {
               <select
                 value={accountType}
                 onChange={(e) => setAccountType(e.target.value as any)}
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition"
+                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-sans"
               >
                 <option value="GCASH">GCash Mobile</option>
                 <option value="LANDBANK">Landbank</option>
@@ -436,7 +530,7 @@ export default function NewExpensePage() {
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value)}
                 placeholder="0917-xxx-xxxx"
-                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3 py-2 text-xs text-white focus:border-[#f26223] focus:outline-none transition font-mono"
+                className="w-full rounded-xl border border-[#262626] bg-[#0c0c0c] px-3.5 py-2.5 text-xs text-white focus:border-[#ff7900] focus:outline-none transition font-mono"
               />
             </div>
           </div>
@@ -449,22 +543,22 @@ export default function NewExpensePage() {
                 required
                 checked={privacyConsent}
                 onChange={(e) => setPrivacyConsent(e.target.checked)}
-                className="mt-0.5 rounded border-[#333] bg-[#0c0c0c] text-[#f26223] focus:ring-0"
+                className="mt-0.5 rounded border-[#333] bg-[#0c0c0c] text-[#ff7900] focus:ring-0 cursor-pointer"
               />
               <span className="text-[11px] text-[#71717a] leading-relaxed">
-                I hereby consent to PUP ACCESS collecting and processing my payment details solely for disbursement,
-                liquidation, and institutional audit purposes in compliance with the{' '}
+                I consent to PUP ACCESS storing these disbursement details solely for liquidation, reimbursements, and institutional audit compliance under the{' '}
                 <strong className="text-[#a1a1aa]">Philippine Data Privacy Act of 2012 (RA 10173)</strong>.
               </span>
             </label>
           </div>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f26223] to-[#ff6b35] py-3 text-xs font-bold text-white shadow-xl shadow-[#f26223]/20 transition hover:brightness-110 cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#ff7900] to-[#f26223] py-3.5 text-xs font-bold text-white shadow-xl shadow-[#ff7900]/25 transition hover:brightness-110 cursor-pointer"
         >
-          <span>Submit Voucher for Tier 1 Endorsement</span>
+          <span>Submit Voucher for Stage 1 Endorsement</span>
           <ArrowRight className="h-4 w-4" />
         </button>
       </form>

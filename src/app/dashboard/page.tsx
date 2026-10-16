@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useFinance } from '@/context/FinanceContext';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { OfficialFinanceSheet } from '@/components/tracker/OfficialFinanceSheet';
 import {
   TrendingUp,
   Wallet,
@@ -35,7 +36,6 @@ export default function DashboardOverviewPage() {
     fundingSourceTotals,
   } = useFinance();
 
-  const [viewMode, setViewMode] = useState<'TABLE' | 'CARDS'>('TABLE');
   const [selectedWalletFilter, setSelectedWalletFilter] = useState<string>('ALL');
 
   // Pending counts
@@ -43,14 +43,6 @@ export default function DashboardOverviewPage() {
   const pendingT2 = transactions.filter((t) => t.status === 'TIER_2_PENDING').length;
   const pendingT3 = transactions.filter((t) => t.status === 'TIER_3_PENDING').length;
   const totalPending = pendingT1 + pendingT2 + pendingT3;
-
-  const burnRate = totalAllocated > 0 ? Math.round((totalSpent / totalAllocated) * 100) : 0;
-
-  // Filter transactions
-  const filteredTransactions = transactions.filter((t) => {
-    if (selectedWalletFilter === 'ALL') return true;
-    return t.wallet === selectedWalletFilter;
-  });
 
   return (
     <div className="space-y-8">
@@ -227,171 +219,8 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* Interactive Ledger Section (Familiar Spreadsheet-Style Interface) */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#222] pb-3">
-          <div>
-            <h2 className="text-lg font-bold text-white font-mono flex items-center gap-2">
-              <TableIcon className="h-4 w-4 text-[#f26223]" />
-              Official Transaction Ledger
-            </h2>
-            <p className="text-xs text-[#a1a1aa]">
-              Formatted to match the familiar ACCESS financial spreadsheet structure with automated balance reconciliation.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {selectedWalletFilter !== 'ALL' && (
-              <button
-                onClick={() => setSelectedWalletFilter('ALL')}
-                className="text-xs font-mono text-[#f26223] hover:underline"
-              >
-                Clear Filter ({selectedWalletFilter})
-              </button>
-            )}
-
-            <div className="rounded-xl bg-[#0c0c0c] p-1 border border-[#222] flex gap-1">
-              <button
-                onClick={() => setViewMode('TABLE')}
-                className={`rounded-lg px-3 py-1 text-xs font-mono font-semibold transition ${
-                  viewMode === 'TABLE' ? 'bg-[#1e1e1e] text-white shadow' : 'text-[#71717a]'
-                }`}
-              >
-                Spreadsheet View
-              </button>
-              <button
-                onClick={() => setViewMode('CARDS')}
-                className={`rounded-lg px-3 py-1 text-xs font-mono font-semibold transition ${
-                  viewMode === 'CARDS' ? 'bg-[#1e1e1e] text-white shadow' : 'text-[#71717a]'
-                }`}
-              >
-                Approval Cards
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Spreadsheet Table View (Faithfully mirrors ACCESS spreadsheet columns) */}
-        {viewMode === 'TABLE' ? (
-          <div className="rounded-2xl border border-[#262626] bg-[#141414] overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
-                <thead className="border-b border-[#262626] bg-[#0d0d0d] text-[#71717a] text-[11px] uppercase tracking-wider">
-                  <tr>
-                    <th className="px-3 py-3">Payee / Entity</th>
-                    <th className="px-3 py-3 text-right">Cash In</th>
-                    <th className="px-3 py-3 text-right">Expense</th>
-                    <th className="px-3 py-3">Date</th>
-                    <th className="px-3 py-3">Wallet</th>
-                    <th className="px-3 py-3">Remarks / Details</th>
-                    <th className="px-3 py-3">Reimbursement Status</th>
-                    <th className="px-3 py-3">Category</th>
-                    <th className="px-3 py-3">Source</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#1f1f1f]">
-                  {filteredTransactions.map((tx) => {
-                    const isCashIn = !!tx.cash_in;
-
-                    return (
-                      <tr key={tx.id} className="hover:bg-[#181818] transition">
-                        {/* Name / Payee */}
-                        <td className="px-3 py-3 font-semibold text-white whitespace-nowrap">
-                          {tx.submitted_by_name || tx.title}
-                        </td>
-
-                        {/* Cash In */}
-                        <td className="px-3 py-3 text-right text-[#00bb7f] font-bold whitespace-nowrap">
-                          {isCashIn ? formatCurrency(tx.cash_in || tx.amount) : '—'}
-                        </td>
-
-                        {/* Expense */}
-                        <td className="px-3 py-3 text-right text-[#fb2c36] font-bold whitespace-nowrap">
-                          {!isCashIn ? formatCurrency(tx.amount) : '—'}
-                        </td>
-
-                        {/* Date */}
-                        <td className="px-3 py-3 text-[#71717a] whitespace-nowrap">
-                          {formatDate(tx.transacted_at)}
-                        </td>
-
-                        {/* Wallet Account (GCash, GoTyme, Cash) */}
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <span
-                            className={`rounded px-1.5 py-0.5 text-[10px] font-bold border ${
-                              tx.wallet === 'GCASH'
-                                ? 'bg-[#0055ff]/10 text-[#0055ff] border-[#0055ff]/30'
-                                : tx.wallet === 'GOTYME'
-                                ? 'bg-[#00bb7f]/10 text-[#00bb7f] border-[#00bb7f]/30'
-                                : 'bg-[#f26223]/10 text-[#f26223] border-[#f26223]/30'
-                            }`}
-                          >
-                            {tx.wallet || 'GCASH'}
-                          </span>
-                        </td>
-
-                        {/* Remarks / Details */}
-                        <td className="px-3 py-3 text-[#a1a1aa] font-sans max-w-xs truncate" title={tx.description || tx.title}>
-                          {tx.remarks || tx.description || tx.title}
-                        </td>
-
-                        {/* Reimbursement Notes / Status */}
-                        <td className="px-3 py-3 whitespace-nowrap font-sans text-[11px]">
-                          {tx.status === 'CERTIFIED_DISBURSED' ? (
-                            <span className="text-[#00bb7f] flex items-center gap-1">
-                              <CheckCircle2 className="h-3 w-3" />
-                              {tx.reimbursement_notes || 'Reimbursed'}
-                            </span>
-                          ) : tx.status === 'REJECTED' ? (
-                            <span className="text-[#fb2c36]">Rejected</span>
-                          ) : (
-                            <span className="text-[#f59e0b]">{tx.reimbursement_notes || 'Pending Approval'}</span>
-                          )}
-                        </td>
-
-                        {/* Category */}
-                        <td className="px-3 py-3 text-[#a1a1aa] whitespace-nowrap">
-                          <span className="rounded bg-[#1a1a1a] px-2 py-0.5 text-[10px] border border-[#2a2a2a]">
-                            {tx.category_name.split('(')[0]}
-                          </span>
-                        </td>
-
-                        {/* Funding Source Tag */}
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <span className="text-[10px] text-[#71717a]">
-                            {tx.funding_source || (tx.category_name.includes('ACCESS') ? 'ACCESS' : 'QUOTA')}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          /* Cards View */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredTransactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="rounded-2xl border border-[#262626] bg-[#141414] p-5 space-y-3 font-mono"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#f26223]">{tx.tracking_number}</span>
-                  <span className="text-xs text-[#71717a]">{formatDate(tx.transacted_at)}</span>
-                </div>
-                <h3 className="text-sm font-bold text-white font-sans">{tx.title}</h3>
-                <p className="text-xs text-[#a1a1aa] font-sans line-clamp-2">{tx.description}</p>
-                <div className="flex justify-between items-center pt-2 border-t border-[#222]">
-                  <span className="text-xs text-[#71717a]">{tx.category_name}</span>
-                  <span className="text-base font-bold text-white">{formatCurrency(tx.amount)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Official Finance Tracker Spreadsheet */}
+      <OfficialFinanceSheet />
 
       {/* Event Quota & Category Breakdown Summary (Replicating ACCESS right-hand table) */}
       <div className="rounded-2xl border border-[#262626] bg-[#141414] p-5 space-y-4">

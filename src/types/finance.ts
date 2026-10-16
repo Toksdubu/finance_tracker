@@ -43,6 +43,32 @@ export type BudgetTechnique =
   | 'ENVELOPE_70_20_10'
   | 'HISTORICAL_BENCHMARK';
 
+export interface FiscalYear {
+  id: string;
+  label: string; // e.g., 'A.Y. 2025-2026'
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  total_budget_cap: number; // Master annual cap (e.g. ₱350,000)
+  created_at: string;
+}
+
+export interface BudgetReallocation {
+  id: string;
+  event_budget_id: string;
+  event_name: string;
+  source_category_id: string; // ID or 'CONTINGENCY' or 'RESERVE'
+  source_category_name: string;
+  target_category_id: string;
+  target_category_name: string;
+  amount: number;
+  reason: string;
+  authorized_by_id: string;
+  authorized_by_name: string;
+  authorized_by_position: string;
+  created_at: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -134,6 +160,23 @@ export interface ExpenseTransaction {
   cash_in?: number;
   remarks?: string;
   reimbursement_notes?: string;
+
+  // Exact Current Finance Tracker Spreadsheet Fields
+  date_formatted?: string; // e.g. "August 20, 2026"
+  transaction_id?: string; // e.g. "TXN-0001"
+  entry_type?: 'Income' | 'Expense';
+  spreadsheet_category?: string; // e.g. "Donation", "Other Expense", "Transfer", etc.
+  money_in?: number | null;
+  money_out?: number | null;
+  balance?: number; // running balance
+  person_responsible?: string; // e.g. "Erica Jhane Guillermo"
+  receipt_proof?: {
+    name: string;
+    file_type?: 'pdf' | 'img';
+    url?: string;
+  };
+  verification?: 'Verified' | 'Pending' | 'Rejected' | 'Unverified';
+  entry_status?: 'Complete' | 'Pending' | 'In Progress' | 'Draft';
 
   // Sensitive Encrypted Fields
   encrypted_payee_info?: string;
